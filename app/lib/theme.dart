@@ -26,7 +26,7 @@ class TSColors {
   ];
 
   static String hexOf(Color c) =>
-      '#${c.value.toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+      '#${c.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
 }
 
 class TSTheme {
@@ -61,7 +61,7 @@ class TSTheme {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
