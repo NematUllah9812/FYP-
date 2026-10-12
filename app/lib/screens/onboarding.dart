@@ -176,17 +176,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text('What brings you here? (optional)',
               style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: TS.s2),
-          for (final (value, label) in [
-            ('fitness', 'Fitness — walk more, feel better'),
-            ('exploration', 'Exploration — discover my area'),
-            ('competition', 'Friendly competition — claim territory'),
-          ])
-            RadioListTile<String>(
-              value: value,
-              groupValue: _intent,
-              onChanged: (v) => setState(() => _intent = v ?? _intent),
-              title: Text(label),
+          RadioGroup<String>(
+            groupValue: _intent,
+            onChanged: (v) => setState(() => _intent = v ?? _intent),
+            child: Column(
+              children: [
+                for (final (value, label) in [
+                  ('fitness', 'Fitness — walk more, feel better'),
+                  ('exploration', 'Exploration — discover my area'),
+                  ('competition', 'Friendly competition — claim territory'),
+                ])
+                  RadioListTile<String>(
+                    value: value,
+                    title: Text(label),
+                  ),
+              ],
             ),
+          ),
           const SizedBox(height: TS.s2),
           FilledButton(
               onPressed: () => setState(() => _step = 3),

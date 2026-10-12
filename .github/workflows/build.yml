@@ -34,11 +34,11 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-      # Pinned: the team's pipeline uses 3.27.4, and floating 'stable' broke
-      # analyze when newer Flutter deprecated/changed theme + color APIs.
+      # Pinned: floating 'stable' broke analyze when newer Flutter changed
+      # theme/color/radio APIs; the code targets the 3.35 API surface.
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.4'
+          flutter-version: '3.35.7'
           channel: stable
           cache: true
       - name: Pub get
