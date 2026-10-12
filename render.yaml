@@ -1,0 +1,17 @@
+# Terrastep server — one-click deploy on Render (free tier).
+# Render: New + -> Blueprint -> pick this repo -> Apply.
+# Gives a permanent public URL like https://terrastep-server.onrender.com
+# which the APK is then built against (TERRASTEP_API dart-define).
+services:
+  - type: web
+    name: terrastep-server
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server/app.py
+    healthCheckPath: /healthz
+    envVars:
+      - key: TERRASTEP_HOST
+        value: 0.0.0.0
+      - key: TERRASTEP_SECRET
+        generateValue: true

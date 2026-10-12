@@ -10,6 +10,11 @@ on:
         description: "Also build a release APK"
         type: boolean
         default: false
+      api_base:
+        description: "Public server URL baked into the APK (e.g. https://terrastep-server.onrender.com). Empty = local dev default."
+        type: string
+        required: false
+        default: ""
 
 jobs:
   server-tests:
@@ -49,7 +54,15 @@ jobs:
         run: flutter analyze
       - name: Build debug APK (compiles Dart + Kotlin tracker)
         working-directory: app
-        run: flutter build apk --debug
+        env:
+          API_BASE: ${{ inputs.api_base }}
+        run: |
+          if [ -n "$API_BASE" ]; then
+            echo "Baking API base into APK: $API_BASE"
+            flutter build apk --debug --dart-define=TERRASTEP_API="$API_BASE"
+          else
+            flutter build apk --debug
+          fi
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:

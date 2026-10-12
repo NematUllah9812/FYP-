@@ -272,6 +272,8 @@ class Handler(BaseHTTPRequestHandler):
         parts = [p for p in parsed.path.split("/") if p]
         query = parse_qs(parsed.query)
         try:
+            if parts == ["healthz"] and method == "GET":
+                return self._send(200, {"ok": True, "service": "terrastep"})
             if parts[:2] == ["v1", "auth"] and method == "POST":
                 return self._auth(parts[2])
             if parts == ["v1", "sessions"] and method == "POST":
@@ -578,9 +580,12 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    port = int(os.environ.get("TERRASTEP_PORT", "8791"))
-    server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    print(f"Terrastep Stage 2 server on http://127.0.0.1:{port} (rules {RULES.rules_version}, season {SEASON_ID})")
+    # TERRASTEP_HOST defaults to loopback for local dev; PaaS hosts (Render,
+    # Railway, ...) set it to 0.0.0.0 and inject their own PORT.
+    host = os.environ.get("TERRASTEP_HOST", "127.0.0.1")
+    port = int(os.environ.get("TERRASTEP_PORT") or os.environ.get("PORT", "8791"))
+    server = ThreadingHTTPServer((host, port), Handler)
+    print(f"Terrastep Stage 2 server on http://{host}:{port} (rules {RULES.rules_version}, season {SEASON_ID})")
     server.serve_forever()
 
 

@@ -1,0 +1,4 @@
+# Terrastep server — only third-party dependency (everything else is the
+# Python standard library). Used by PaaS deploys (Render/Railway) and by
+# anyone running server/app.py directly.
+h3==4.5.0
