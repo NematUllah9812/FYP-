@@ -1,0 +1,64 @@
+name: Terrastep CI
+
+on:
+  push:
+    branches: [main, "muse/complete-build-v1"]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Also build a release APK"
+        type: boolean
+        default: false
+
+jobs:
+  server-tests:
+    name: Referee + server tests (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: pip install h3 pytest
+      - name: Run tests
+        run: python -m pytest tests/ -q
+
+  app-build:
+    name: Flutter analyze + APK build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Pub get
+        working-directory: app
+        run: flutter pub get
+      - name: Analyze (must be clean)
+        working-directory: app
+        run: flutter analyze
+      - name: Build debug APK (compiles Dart + Kotlin tracker)
+        working-directory: app
+        run: flutter build apk --debug
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: terrastep-debug-apk
+          path: app/build/app/outputs/flutter-apk/app-debug.apk
+      - name: Build release APK (manual runs only)
+        if: ${{ inputs.release }}
+        working-directory: app
+        run: flutter build apk --release
+      - name: Upload release APK
+        if: ${{ inputs.release }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: terrastep-release-apk
+          path: app/build/app/outputs/flutter-apk/app-release.apk
